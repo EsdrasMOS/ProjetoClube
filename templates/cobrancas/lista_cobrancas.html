@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}Cobranças{% endblock %}
+
+{% block content %}
+<h1>Cobranças</h1>
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+{% endif %}
+
+{% if user.tipo_usuario == 'funcionario' %}
+    <a href="{% url 'nova_cobranca' %}" class="btn">Nova Cobrança</a>
+{% endif %}
+
+{% if cobrancas %}
+    <table>
+        <thead>
+            <tr>
+                <th>Sócio</th>
+                <th>Serviço</th>
+                <th>Valor</th>
+                <th>Vencimento</th>
+                <th>Status</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for cob in cobrancas %}
+                <tr>
+                    <td>{{ cob.socio.nome }}</td>
+                    <td>{{ cob.servico }}</td>
+                    <td>R$ {{ cob.valor }}</td>
+                    <td>{{ cob.vencimento|date:"d/m/Y" }}</td>
+                    <td>{% if cob.pago %}Paga{% else %}Pendente{% endif %}</td>
+                    <td>
+                        {% if user.tipo_usuario == 'funcionario' %}
+                            <a href="{% url 'editar_cobranca' cob.id %}">Editar</a> |
+                            <a href="{% url 'deletar_cobranca' cob.id %}" onclick="return confirm('Tem certeza?')">Deletar</a>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <p>Não há cobranças.</p>
+{% endif %}
+{% endblock %}

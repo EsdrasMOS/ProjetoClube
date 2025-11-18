@@ -10,4 +10,4 @@ class Cobranca(models.Model):
     observacao = models.TextField(blank=True, null=True)
 
     def __str__(self):
-        return f"Cobrança {self.id} - {self.socio.nome}"
+        return f"Cobrança {self.id} - {self.socio.nome} - R$ {self.valor}"
