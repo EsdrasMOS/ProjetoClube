@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block title %}Meus Agendamentos{% endblock %}
+
+{% block content %}
+<h1>Meus Agendamentos</h1>
+
+<a href="{% url 'novo_agendamento' %}" class="btn">Novo Agendamento</a>
+
+{% if agendamentos %}
+    <ul>
+    {% for ag in agendamentos %}
+        <li>{{ ag.servico.nome }} - {{ ag.data_hora|date:"d/m/Y H:i" }} {% if ag.observacao %}- Obs: {{ ag.observacao }}{% endif %}</li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>Você não tem agendamentos.</p>
+{% endif %}
+
+{% endblock %}

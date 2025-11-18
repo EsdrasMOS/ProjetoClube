@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard do Funcionário{% endblock %}
+
+{% block content %}
+<h1>Olá, {{ user.username }}!</h1>
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; margin-top: 20px;">
+    <div style="background: #e8f5e9; padding: 15px; border-radius: 8px; text-align: center;">
+        <h3>Cobranças</h3>
+        <p>Gerencie as cobranças dos sócios.</p>
+        <a href="#" class="btn">Gerenciar Cobranças</a>
+    </div>
+    <div style="background: #bbdefb; padding: 15px; border-radius: 8px; text-align: center;">
+        <h3>Info de Sócios</h3>
+        <p>Consulte e edite dados dos sócios.</p>
+        <a href="#" class="btn">Ver Sócios</a>
+    </div>
+    <div style="background: #ffccbc; padding: 15px; border-radius: 8px; text-align: center;">
+        <h3>Convites</h3>
+        <p>Envie convites para novos sócios.</p>
+        <a href="#" class="btn">Enviar Convites</a>
+    </div>
+    <div style="background: #c8e6c9; padding: 15px; border-radius: 8px; text-align: center;">
+        <h3>Departamento Pessoal</h3>
+        <p>Gerencie funcionários e permissões.</p>
+        <a href="#" class="btn">Gerenciar Equipe</a>
+    </div>
+</div>
+{% endblock %}

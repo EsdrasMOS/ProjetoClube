@@ -1,0 +1,31 @@
+# Arquivos de banco de dados
+*.sqlite3
+*.db
+
+# Chaves secretas e configurações locais
+project/settings.py  # Ou o arquivo que contém SECRET_KEY, se for local
+.env  # Se usar variáveis de ambiente
+
+# Ambiente virtual
+.venv/
+venv/
+env/
+
+# Arquivos de cache e logs
+__pycache__/
+*.pyc
+*.pyo
+*.log
+
+# Arquivos do Django
+staticfiles/
+media/
+
+# Arquivos do IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Outros
+.DS_Store

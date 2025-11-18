@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}Login de Funcionário{% endblock %}
+
+{% block content %}
+<h1>Login de Funcionário</h1>
+<form method="post" style="max-width: 400px;">
+    {% csrf_token %}
+    <div>
+        <label for="id_username">ID de Entrada (CPF/Email/Usuário):</label><br>
+        <input type="text" id="id_username" name="username" required />
+    </div>
+    <div style="margin-top: 10px;">
+        <label for="id_password">Senha:</label><br>
+        <input type="password" id="id_password" name="password" required />
+    </div>
+    <button type="submit" class="btn" style="margin-top: 15px;">Entrar</button>
+</form>
+<p style="margin-top: 10px;">
+    Não tem conta? <a href="{% url 'registro_funcionario' %}">Cadastre-se aqui</a>.
+</p>
+{% endblock %}

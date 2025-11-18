@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+
+{% block title %}Perfil do Funcionário{% endblock %}
+
+{% block content %}
+<h1>Perfil: {{ funcionario.nome }}</h1>
+<p><strong>Função:</strong> {{ funcionario.funcao }}</p>
+<p><strong>Identificação:</strong> {{ funcionario.identificacao }}</p>
+{% endblock %}

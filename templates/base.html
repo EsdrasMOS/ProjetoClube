@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8" />
+    <title>{% block title %}Sistema do Clube{% endblock %}</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; background: #f5f5f5; }
+        header { background: #4caf50; padding: 15px 20px; color: white; display: flex; justify-content: space-between; align-items: center; }
+        nav a { color: white; margin-left: 15px; text-decoration: none; font-weight: bold; }
+        .container { max-width: 1200px; margin: 20px auto; padding: 20px; background: white; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        footer { background: #333; color: white; padding: 10px; text-align: center; margin-top: 20px; }
+        .btn { background: #4caf50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block; }
+        .btn:hover { background: #45a049; }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">LOGO</div>
+        {% if user.is_authenticated %}
+            <nav>
+                {% if user.tipo_usuario == 'funcionario' %}
+                    <a href="{% url 'dashboard_funcionario' %}">Dashboard Funcionário</a>
+                {% else %}
+                    <a href="{% url 'dashboard_socio' %}">Dashboard Sócio</a>
+                {% endif %}
+                <a href="{% url 'logout' %}">Sair</a>
+            </nav>
+        {% else %}
+            <nav>
+                <a href="{% url 'login_socio' %}">Login Sócio</a>
+                <a href="{% url 'login_funcionario' %}">Login Funcionário</a>
+            </nav>
+        {% endif %}
+    </header>
+
+    <div class="container">
+        {% block content %}
+        {% endblock %}
+    </div>
+
+    <footer>
+        &copy; 2025 Sistema do Clube. Todos os direitos reservados.
+    </footer>
+</body>
+</html>

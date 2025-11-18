@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}Página Inicial{% endblock %}
+
+{% block content %}
+<h1>Bem-vindo ao Sistema do Clube</h1>
+<p>Selecione o tipo de acesso:</p>
+
+<div style="display: flex; gap: 20px; margin-top: 30px;">
+    <div style="flex: 1; background: #e8f5e9; padding: 20px; border-radius: 8px; text-align: center;">
+        <h2>Sócio</h2>
+        <p>Acesse sua conta ou cadastre-se.</p>
+        <a href="{% url 'login_socio' %}" class="btn">Entrar como Sócio</a><br><br>
+        <a href="{% url 'registro_socio' %}" class="btn">Cadastrar como Sócio</a>
+    </div>
+    <div style="flex: 1; background: #bbdefb; padding: 20px; border-radius: 8px; text-align: center;">
+        <h2>Funcionário</h2>
+        <p>Acesse o painel administrativo.</p>
+        <a href="{% url 'login_funcionario' %}" class="btn">Entrar como Funcionário</a><br><br>
+        <a href="{% url 'registro_funcionario' %}" class="btn">Cadastrar como Funcionário</a>
+    </div>
+</div>
+{% endblock %}
