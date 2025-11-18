@@ -3,18 +3,40 @@
 {% block title %}Meus Agendamentos{% endblock %}
 
 {% block content %}
-<h1>Meus Agendamentos</h1>
+<h1>Agendamentos</h1>
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+{% endif %}
 
 <a href="{% url 'novo_agendamento' %}" class="btn">Novo Agendamento</a>
 
 {% if agendamentos %}
-    <ul>
-    {% for ag in agendamentos %}
-        <li>{{ ag.servico.nome }} - {{ ag.data_hora|date:"d/m/Y H:i" }} {% if ag.observacao %}- Obs: {{ ag.observacao }}{% endif %}</li>
-    {% endfor %}
-    </ul>
+    <table>
+        <thead>
+            <tr>
+                <th>Serviço</th>
+                <th>Data/Hora</th>
+                <th>Observação</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for ag in agendamentos %}
+                <tr>
+                    <td>{{ ag.servico.nome }}</td>
+                    <td>{{ ag.data_hora|date:"d/m/Y H:i" }}</td>
+                    <td>{{ ag.observacao|truncatechars:20 }}</td>
+                    <td>
+                        <a href="{% url 'editar_agendamento' ag.id %}">Editar</a> |
+                        <a href="{% url 'deletar_agendamento' ag.id %}" onclick="return confirm('Tem certeza?')">Deletar</a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 {% else %}
-    <p>Você não tem agendamentos.</p>
+    <p>Não há agendamentos.</p>
 {% endif %}
-
 {% endblock %}
