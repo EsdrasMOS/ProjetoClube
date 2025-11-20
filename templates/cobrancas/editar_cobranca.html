@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}Editar Cobrança{% endblock %}
+
+{% block content %}
+<h1>Editar Cobrança</h1>
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+{% endif %}
+
+<form method="post">
+    {% csrf_token %}
+    
+    <div style="margin-bottom: 15px;">
+        <label for="{{ form.socio.id_for_label }}">Sócio:</label><br>
+        {{ form.socio }}
+        {% if form.socio.errors %}
+            <div style="color: red;">{{ form.socio.errors }}</div>
+        {% endif %}
+    </div>
+
+    <div style="margin-bottom: 15px;">
+        <label for="{{ form.servico.id_for_label }}">Serviço:</label><br>
+        {{ form.servico }}
+        {% if form.servico.errors %}
+            <div style="color: red;">{{ form.servico.errors }}</div>
+        {% endif %}
+    </div>
+
+    <div style="margin-bottom: 15px;">
+        <label for="{{ form.valor.id_for_label }}">Valor (R$):</label><br>
+        {{ form.valor }}
+        {% if form.valor.errors %}
+            <div style="color: red;">{{ form.valor.errors }}</div>
+        {% endif %}
+    </div>
+
+    <div style="margin-bottom: 15px;">
+        <label for="{{ form.vencimento.id_for_label }}">Vencimento:</label><br>
+        {{ form.vencimento }}
+        {% if form.vencimento.errors %}
+            <div style="color: red;">{{ form.vencimento.errors }}</div>
+        {% endif %}
+    </div>
+
+    <div style="margin-bottom: 15px;">
+        <label for="{{ form.observacao.id_for_label }}">Observação:</label><br>
+        {{ form.observacao }}
+        {% if form.observacao.errors %}
+            <div style="color: red;">{{ form.observacao.errors }}</div>
+        {% endif %}
+    </div>
+
+    <div style="margin-bottom: 15px;">
+        {{ form.pago }} <label for="{{ form.pago.id_for_label }}">Marcar como paga</label>
+        {% if form.pago.errors %}
+            <div style="color: red;">{{ form.pago.errors }}</div>
+        {% endif %}
+    </div>
+
+    <button type="submit" class="btn">Salvar Alterações</button>
+</form>
+{% endblock %}

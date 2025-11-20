@@ -4,13 +4,17 @@ from django.contrib import messages
 from django.core.paginator import Paginator
 from .models import Socio
 from .forms import SocioForm 
+from django.db.models import Q
 
 def lista_socios(request):
-    socios_list = Socio.objects.all()
-    paginator = Paginator(socios_list, 10)  
+    query = request.GET.get('q', '')
+    socios_list = Socio.objects.filter(
+        Q(nome__icontains=query) | Q(cpf__icontains=query) | Q(email__icontains=query)
+    )
+    paginator = Paginator(socios_list, 10)
     page_number = request.GET.get('page')
     socios = paginator.get_page(page_number)
-    return render(request, 'socios/lista_socios.html', {'socios': socios})
+    return render(request, 'socios/lista_socios.html', {'socios': socios, 'query': query})
 
 def detalhe_socio(request, socio_id):
     socio = get_object_or_404(Socio, id=socio_id)

@@ -4,13 +4,17 @@ from django.contrib import messages
 from .models import Funcionario
 from .forms import FuncionarioForm 
 from django.core.paginator import Paginator
+from django.db.models import Q
 
 def lista_funcionarios(request):
-    funcionarios_list = Funcionario.objects.all()
-    paginator = Paginator(funcionarios_list, 10)  
+    query = request.GET.get('q', '')
+    funcionarios_list = Funcionario.objects.filter(
+        Q(nome__icontains=query) | Q(funcao__icontains=query)
+    )
+    paginator = Paginator(funcionarios_list, 10)
     page_number = request.GET.get('page')
     funcionarios = paginator.get_page(page_number)
-    return render(request, 'funcionarios/lista_funcionarios.html', {'funcionarios': funcionarios})
+    return render(request, 'funcionarios/lista_funcionarios.html', {'funcionarios': funcionarios, 'query': query})
 
 def detalhe_funcionario(request, funcionario_id):
     funcionario = get_object_or_404(Funcionario, id=funcionario_id)

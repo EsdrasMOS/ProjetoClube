@@ -4,15 +4,16 @@
 
 {% block content %}
 <h1>Cobranças</h1>
-{% if messages %}
-    {% for message in messages %}
-        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
-    {% endfor %}
-{% endif %}
 
-{% if user.tipo_usuario == 'funcionario' %}
-    <a href="{% url 'nova_cobranca' %}" class="btn">Nova Cobrança</a>
-{% endif %}
+<form method="get" style="margin-bottom: 20px;">
+    <input type="text" name="q" value="{{ query }}" placeholder="Buscar por serviço ou sócio..." style="padding: 8px; width: 300px;">
+    <select name="status">
+        <option value="">Todos os status</option>
+        <option value="pago" {% if status_filter == 'pago' %}selected{% endif %}>Pago</option>
+        <option value="pendente" {% if status_filter == 'pendente' %}selected{% endif %}>Pendente</option>
+    </select>
+    <button type="submit" class="btn">Filtrar</button>
+</form>
 
 {% if cobrancas %}
     <table>

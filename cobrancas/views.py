@@ -4,17 +4,8 @@ from django.contrib import messages
 from .models import Cobranca
 from usuarios.models import Usuario
 from django.core.paginator import Paginator
-
-@login_required
-def lista_cobrancas(request):
-    if request.user.tipo_usuario == Usuario.IS_SOCIO:
-        cobrancas_list = Cobranca.objects.filter(socio__usuario=request.user)
-    else:
-        cobrancas_list = Cobranca.objects.all()
-    paginator = Paginator(cobrancas_list, 10)
-    page_number = request.GET.get('page')
-    cobrancas = paginator.get_page(page_number)
-    return render(request, 'cobrancas/lista_cobrancas.html', {'cobrancas': cobrancas})
+from django.db.models import Q
+from .forms import CobrancaForm
 
 @login_required
 def nova_cobranca(request):
@@ -22,19 +13,15 @@ def nova_cobranca(request):
         messages.error(request, 'Acesso negado.')
         return redirect('dashboard_socio')
     
-    from socios.models import Socio  
-    socios = Socio.objects.all()
     if request.method == 'POST':
-        socio_id = request.POST.get('socio')
-        servico = request.POST.get('servico')
-        valor = request.POST.get('valor')
-        vencimento = request.POST.get('vencimento')
-        observacao = request.POST.get('observacao', '')
-        socio = Socio.objects.get(id=socio_id)
-        Cobranca.objects.create(socio=socio, servico=servico, valor=valor, vencimento=vencimento, observacao=observacao)
-        messages.success(request, 'Cobrança criada com sucesso!')
-        return redirect('lista_cobrancas')
-    return render(request, 'cobrancas/nova_cobranca.html', {'socios': socios})
+        form = CobrancaForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Cobrança criada com sucesso!')
+            return redirect('lista_cobrancas')
+    else:
+        form = CobrancaForm()
+    return render(request, 'cobrancas/nova_cobranca.html', {'form': form})
 
 @login_required
 def editar_cobranca(request, cobranca_id):
@@ -43,19 +30,36 @@ def editar_cobranca(request, cobranca_id):
         messages.error(request, 'Acesso negado.')
         return redirect('lista_cobrancas')
     
-    from socios.models import Socio
-    socios = Socio.objects.all()
     if request.method == 'POST':
-        cobranca.socio_id = request.POST.get('socio')
-        cobranca.servico = request.POST.get('servico')
-        cobranca.valor = request.POST.get('valor')
-        cobranca.vencimento = request.POST.get('vencimento')
-        cobranca.pago = 'pago' in request.POST
-        cobranca.observacao = request.POST.get('observacao', '')
-        cobranca.save()
-        messages.success(request, 'Cobrança atualizada!')
-        return redirect('lista_cobrancas')
-    return render(request, 'cobrancas/editar_cobranca.html', {'cobranca': cobranca, 'socios': socios})
+        form = CobrancaForm(request.POST, instance=cobranca)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Cobrança atualizada!')
+            return redirect('lista_cobrancas')
+    else:
+        form = CobrancaForm(instance=cobranca)
+    return render(request, 'cobrancas/editar_cobranca.html', {'form': form})
+
+@login_required
+def lista_cobrancas(request):
+    query = request.GET.get('q', '')
+    status_filter = request.GET.get('status', '')
+    if request.user.tipo_usuario == Usuario.IS_SOCIO:
+        cobrancas_list = Cobranca.objects.filter(socio__usuario=request.user)
+    else:
+        cobrancas_list = Cobranca.objects.all()
+    
+    if query:
+        cobrancas_list = cobrancas_list.filter(
+            Q(servico__icontains=query) | Q(socio__nome__icontains=query)
+        )
+    if status_filter:
+        cobrancas_list = cobrancas_list.filter(pago=(status_filter == 'pago'))
+    
+    paginator = Paginator(cobrancas_list, 10)
+    page_number = request.GET.get('page')
+    cobrancas = paginator.get_page(page_number)
+    return render(request, 'cobrancas/lista_cobrancas.html', {'cobrancas': cobrancas, 'query': query, 'status_filter': status_filter})
 
 @login_required
 def deletar_cobranca(request, cobranca_id):

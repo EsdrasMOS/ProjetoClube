@@ -4,17 +4,8 @@ from django.contrib import messages
 from .models import Agendamento, Servico
 from usuarios.models import Usuario
 from django.core.paginator import Paginator
-
-@login_required
-def lista_agendamentos(request):
-    if request.user.tipo_usuario == Usuario.IS_SOCIO:
-        agendamentos_list = Agendamento.objects.filter(socio__usuario=request.user)
-    else:
-        agendamentos_list = Agendamento.objects.all()
-    paginator = Paginator(agendamentos_list, 10)
-    page_number = request.GET.get('page')
-    agendamentos = paginator.get_page(page_number)
-    return render(request, 'agendamentos/lista_agendamentos.html', {'agendamentos': agendamentos})
+from django.db.models import Q
+from .forms import AgendamentoForm
 
 @login_required
 def novo_agendamento(request):
@@ -22,17 +13,33 @@ def novo_agendamento(request):
         messages.error(request, 'Acesso negado.')
         return redirect('dashboard_funcionario')
     
-    servicos = Servico.objects.all()
     if request.method == 'POST':
-        servico_id = request.POST.get('servico')
-        data_hora = request.POST.get('data_hora')
-        observacao = request.POST.get('observacao', '')
-        servico = Servico.objects.get(id=servico_id)
-        socio = request.user.socio
-        Agendamento.objects.create(socio=socio, servico=servico, data_hora=data_hora, observacao=observacao)
-        messages.success(request, 'Agendamento criado com sucesso!')
-        return redirect('lista_agendamentos')
-    return render(request, 'agendamentos/novo_agendamento.html', {'servicos': servicos})
+        form = AgendamentoForm(request.POST)
+        if form.is_valid():
+            agendamento = form.save(commit=False)
+            agendamento.socio = request.user.socio
+            agendamento.save()
+            messages.success(request, 'Agendamento criado com sucesso!')
+            return redirect('lista_agendamentos')
+    else:
+        form = AgendamentoForm()
+    return render(request, 'agendamentos/novo_agendamento.html', {'form': form})
+
+@login_required
+def lista_agendamentos(request):
+    query = request.GET.get('q', '')
+    if request.user.tipo_usuario == Usuario.IS_SOCIO:
+        agendamentos_list = Agendamento.objects.filter(socio__usuario=request.user)
+    else:
+        agendamentos_list = Agendamento.objects.all()
+    
+    agendamentos_list = agendamentos_list.filter(
+        Q(servico__nome__icontains=query) | Q(observacao__icontains=query)
+    )
+    paginator = Paginator(agendamentos_list, 10)
+    page_number = request.GET.get('page')
+    agendamentos = paginator.get_page(page_number)
+    return render(request, 'agendamentos/lista_agendamentos.html', {'agendamentos': agendamentos, 'query': query})
 
 @login_required
 def editar_agendamento(request, agendamento_id):

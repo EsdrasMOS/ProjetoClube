@@ -4,21 +4,23 @@
 
 {% block content %}
 <h1>Lista de Sócios</h1>
+
+<form method="get" style="margin-bottom: 20px;">
+    <input type="text" name="q" value="{{ query }}" placeholder="Buscar por nome, CPF ou email..." style="padding: 8px; width: 300px;">
+    <button type="submit" class="btn">Buscar</button>
+</form>
+
 {% for socio in socios %}
-    <p>{{ socio.nome }} - <a href="{% url 'detalhe_socio' socio.id %}">Ver Detalhes</a></p>
+    <p>{{ socio.nome }} - CPF: {{ socio.cpf }} - <a href="{% url 'detalhe_socio' socio.id %}">Ver Detalhes</a></p>
 {% endfor %}
 
-<div class="pagination">
+<div class="pagination" style="margin-top: 20px; text-align: center;">
     <span class="step-links">
         {% if socios.has_previous %}
             <a href="?page=1">&laquo; first</a>
             <a href="?page={{ socios.previous_page_number }}">previous</a>
         {% endif %}
-
-        <span class="current">
-            Page {{ socios.number }} of {{ socios.paginator.num_pages }}.
-        </span>
-
+        <span class="current">Page {{ socios.number }} of {{ socios.paginator.num_pages }}.</span>
         {% if socios.has_next %}
             <a href="?page={{ socios.next_page_number }}">next</a>
             <a href="?page={{ socios.paginator.num_pages }}">last &raquo;</a>

@@ -3,9 +3,15 @@
 {% block title %}Lista de Funcionários{% endblock %}
 
 {% block content %}
-<h1>Lista de Funcionarios</h1>
+<h1>Lista de Funcionários</h1>
+
+<form method="get" style="margin-bottom: 20px;">
+    <input type="text" name="q" value="{{ query }}" placeholder="Buscar por nome ou função..." style="padding: 8px; width: 300px;">
+    <button type="submit" class="btn">Buscar</button>
+</form>
+
 {% for funcionario in funcionarios %}
-    <p>{{ funcionario.nome }} - <a href="{% url 'detalhe_funcionario' funcionario.id %}">Ver Detalhes</a></p>
+    <p>{{ funcionario.nome }} - {{ funcionario.funcao }} - <a href="{% url 'detalhe_funcionario' funcionario.id %}">Ver Detalhes</a></p>
 {% endfor %}
 
 <div class="pagination">

@@ -4,32 +4,14 @@
 
 {% block content %}
 <h1>Nova Cobrança</h1>
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+{% endif %}
 <form method="post">
     {% csrf_token %}
-    <div>
-        <label for="id_socio">Sócio:</label><br>
-        <select name="socio" id="id_socio" required>
-            {% for socio in socios %}
-                <option value="{{ socio.id }}">{{ socio.nome }}</option>
-            {% endfor %}
-        </select>
-    </div>
-    <div style="margin-top:10px;">
-        <label for="id_servico">Serviço:</label><br>
-        <input type="text" name="servico" id="id_servico" required>
-    </div>
-    <div style="margin-top:10px;">
-        <label for="id_valor">Valor:</label><br>
-        <input type="number" step="0.01" name="valor" id="id_valor" required>
-    </div>
-    <div style="margin-top:10px;">
-        <label for="id_vencimento">Vencimento:</label><br>
-        <input type="date" name="vencimento" id="id_vencimento" required>
-    </div>
-    <div style="margin-top:10px;">
-        <label for="id_observacao">Observação:</label><br>
-        <textarea name="observacao" id="id_observacao"></textarea>
-    </div>
-    <button type="submit" class="btn" style="margin-top: 15px;">Criar Cobrança</button>
+    {{ form.as_p }}
+    <button type="submit" class="btn">Criar Cobrança</button>
 </form>
 {% endblock %}
