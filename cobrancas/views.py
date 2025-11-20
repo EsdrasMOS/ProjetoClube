@@ -3,13 +3,17 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .models import Cobranca
 from usuarios.models import Usuario
+from django.core.paginator import Paginator
 
 @login_required
 def lista_cobrancas(request):
     if request.user.tipo_usuario == Usuario.IS_SOCIO:
-        cobrancas = Cobranca.objects.filter(socio__usuario=request.user)
+        cobrancas_list = Cobranca.objects.filter(socio__usuario=request.user)
     else:
-        cobrancas = Cobranca.objects.all()  # Funcionários veem todas
+        cobrancas_list = Cobranca.objects.all()
+    paginator = Paginator(cobrancas_list, 10)
+    page_number = request.GET.get('page')
+    cobrancas = paginator.get_page(page_number)
     return render(request, 'cobrancas/lista_cobrancas.html', {'cobrancas': cobrancas})
 
 @login_required
@@ -18,7 +22,7 @@ def nova_cobranca(request):
         messages.error(request, 'Acesso negado.')
         return redirect('dashboard_socio')
     
-    from socios.models import Socio  # Import aqui para evitar circular
+    from socios.models import Socio  
     socios = Socio.objects.all()
     if request.method == 'POST':
         socio_id = request.POST.get('socio')

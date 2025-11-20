@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %}Lista de Sócios{% endblock %}
+
+{% block content %}
+<h1>Lista de Sócios</h1>
+{% for socio in socios %}
+    <p>{{ socio.nome }} - <a href="{% url 'detalhe_socio' socio.id %}">Ver Detalhes</a></p>
+{% endfor %}
+
+<div class="pagination">
+    <span class="step-links">
+        {% if socios.has_previous %}
+            <a href="?page=1">&laquo; first</a>
+            <a href="?page={{ socios.previous_page_number }}">previous</a>
+        {% endif %}
+
+        <span class="current">
+            Page {{ socios.number }} of {{ socios.paginator.num_pages }}.
+        </span>
+
+        {% if socios.has_next %}
+            <a href="?page={{ socios.next_page_number }}">next</a>
+            <a href="?page={{ socios.paginator.num_pages }}">last &raquo;</a>
+        {% endif %}
+    </span>
+</div>
+{% endblock %}

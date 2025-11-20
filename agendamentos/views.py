@@ -3,13 +3,17 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .models import Agendamento, Servico
 from usuarios.models import Usuario
+from django.core.paginator import Paginator
 
 @login_required
 def lista_agendamentos(request):
     if request.user.tipo_usuario == Usuario.IS_SOCIO:
-        agendamentos = Agendamento.objects.filter(socio__usuario=request.user)
+        agendamentos_list = Agendamento.objects.filter(socio__usuario=request.user)
     else:
-        agendamentos = Agendamento.objects.all()  # Funcionários veem todos
+        agendamentos_list = Agendamento.objects.all()
+    paginator = Paginator(agendamentos_list, 10)
+    page_number = request.GET.get('page')
+    agendamentos = paginator.get_page(page_number)
     return render(request, 'agendamentos/lista_agendamentos.html', {'agendamentos': agendamentos})
 
 @login_required
