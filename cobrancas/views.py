@@ -14,11 +14,15 @@ def nova_cobranca(request):
         return redirect('dashboard_socio')
     
     if request.method == 'POST':
-        form = CobrancaForm(request.POST)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Cobrança criada com sucesso!')
-            return redirect('lista_cobrancas')
+        socio_id = request.POST.get('socio')
+        servico_id = request.POST.get('servico')
+        vencimento = request.POST.get('vencimento')
+        observacao = request.POST.get('observacao', '')
+        socio = Socio.objects.get(id=socio_id)
+        servico = Servico.objects.get(id=servico_id)
+        Cobranca.objects.create(socio=socio, servico=servico, vencimento=vencimento, observacao=observacao)
+        messages.success(request, 'Cobrança criada com sucesso!')
+        return redirect('lista_cobrancas')
     else:
         form = CobrancaForm()
     return render(request, 'cobrancas/nova_cobranca.html', {'form': form})
@@ -40,26 +44,24 @@ def editar_cobranca(request, cobranca_id):
         form = CobrancaForm(instance=cobranca)
     return render(request, 'cobrancas/editar_cobranca.html', {'form': form})
 
+
 @login_required
 def lista_cobrancas(request):
-    query = request.GET.get('q', '')
-    status_filter = request.GET.get('status', '')
-    if request.user.tipo_usuario == Usuario.IS_SOCIO:
-        cobrancas_list = Cobranca.objects.filter(socio__usuario=request.user)
-    else:
-        cobrancas_list = Cobranca.objects.all()
-    
-    if query:
-        cobrancas_list = cobrancas_list.filter(
-            Q(servico__icontains=query) | Q(socio__nome__icontains=query)
-        )
-    if status_filter:
-        cobrancas_list = cobrancas_list.filter(pago=(status_filter == 'pago'))
-    
-    paginator = Paginator(cobrancas_list, 10)
-    page_number = request.GET.get('page')
-    cobrancas = paginator.get_page(page_number)
-    return render(request, 'cobrancas/lista_cobrancas.html', {'cobrancas': cobrancas, 'query': query, 'status_filter': status_filter})
+         query = request.GET.get('query', '')  
+         status_filter = request.GET.get('status', '')  
+         cobrancas = Cobranca.objects.all()
+         
+         if query:
+             cobrancas = cobrancas.filter(description__icontains=query)  
+         if status_filter:
+             cobrancas = cobrancas.filter(status=status_filter)
+         
+         return render(request, 'cobrancas/lista_cobrancas.html', {
+             'cobrancas': cobrancas,
+             'query': query,  
+             'status_filter': status_filter, 
+         })
+     
 
 @login_required
 def deletar_cobranca(request, cobranca_id):

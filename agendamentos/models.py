@@ -3,9 +3,10 @@ from socios.models import Socio
 
 class Servico(models.Model):
     nome = models.CharField(max_length=100)
+    valor = models.DecimalField(max_digits=8, decimal_places=2, default=0.00)  # Novo campo
 
     def __str__(self):
-        return self.nome
+        return f"{self.nome} - R$ {self.valor}"
 
 class Agendamento(models.Model):
     socio = models.ForeignKey(Socio, on_delete=models.CASCADE)

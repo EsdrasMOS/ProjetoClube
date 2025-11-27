@@ -14,7 +14,7 @@ def lista_socios(request):
     paginator = Paginator(socios_list, 10)
     page_number = request.GET.get('page')
     socios = paginator.get_page(page_number)
-    return render(request, 'socios/lista_socios.html', {'socios': socios, 'query': query})
+    return render(request, 'socios/lista_socio.html', {'socios': socios, 'query': query})
 
 def detalhe_socio(request, socio_id):
     socio = get_object_or_404(Socio, id=socio_id)

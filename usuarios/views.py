@@ -6,15 +6,19 @@ from .models import Usuario
 from django.contrib.auth.forms import UserCreationForm
 from socios.models import Socio
 from funcionarios.models import Funcionario
-from .forms import UsuarioCreationForm  # Adicione esta importação
+from .forms import UsuarioCreationForm 
 
 def registro_socio(request):
+    print("View registro_sócio chamada")
     if request.method == 'POST':
+        print("Método POST detectado") 
         form = UsuarioCreationForm(request.POST)
+        print(f"Form válido: {form.is_valid()}") 
         if form.is_valid():
             user = form.save(commit=False)
             user.tipo_usuario = Usuario.IS_SOCIO
             user.save()
+            print(f"Usuário salvo: {user.username}")
             
             Socio.objects.create(
                 usuario=user,
@@ -24,7 +28,7 @@ def registro_socio(request):
                 email=request.POST.get('email', ''),
                 data_nascimento=request.POST.get('data_nascimento') or None
             )
-            
+            print("Sócio criado")
             login(request, user)
             messages.success(request, 'Cadastro realizado com sucesso!')
             return redirect('dashboard_socio')
@@ -33,12 +37,16 @@ def registro_socio(request):
     return render(request, 'socios/registro_socio.html', {'form': form})
 
 def registro_funcionario(request):
+    print("View registro_funcionario chamada")
     if request.method == 'POST':
+        print("Método POST detectado") 
         form = UsuarioCreationForm(request.POST)
+        print(f"Form válido: {form.is_valid()}") 
         if form.is_valid():
             user = form.save(commit=False)
             user.tipo_usuario = Usuario.IS_FUNCIONARIO
             user.save()
+            print(f"Usuário salvo: {user.username}")
             
             Funcionario.objects.create(
                 usuario=user,
@@ -46,10 +54,11 @@ def registro_funcionario(request):
                 funcao=request.POST.get('funcao'),
                 identificacao=request.POST.get('identificacao')
             )
-            
+            print("Funcionário criado") 
             login(request, user)
-            messages.success(request, 'Cadastro realizado com sucesso!')
             return redirect('dashboard_funcionario')
+        else:
+            print(f"Erros no form: {form.errors}") 
     else:
         form = UsuarioCreationForm()
     return render(request, 'funcionarios/registro_funcionario.html', {'form': form})
@@ -64,21 +73,30 @@ def login_socio(request):
         user = authenticate(request, username=username, password=password)
         if user and user.tipo_usuario == Usuario.IS_SOCIO:
             login(request, user)
+            print("Login bem-sucedido, redirecionando para dashboard_socio")  # Debug
             return redirect('dashboard_socio')
         else:
             messages.error(request, 'Credenciais inválidas ou acesso negado.')
     return render(request, 'socios/login_socio.html')
 
 def login_funcionario(request):
+    print("View login_funcionario chamada")  # Debug no início
     if request.method == 'POST':
+        print("Método POST detectado")
         username = request.POST.get('username')
         password = request.POST.get('password')
+        print(f"Username: {username}, Password: {password}")  
+        
         user = authenticate(request, username=username, password=password)
+        print(f"User autenticado: {user}")  
+        
         if user and user.tipo_usuario == Usuario.IS_FUNCIONARIO:
             login(request, user)
+            print("Redirecionando para dashboard_funcionario") 
             return redirect('dashboard_funcionario')
         else:
             messages.error(request, 'Credenciais inválidas ou acesso negado.')
+            print("Falha na autenticação") 
     return render(request, 'funcionarios/login_funcionario.html')
 
 def logout_view(request):

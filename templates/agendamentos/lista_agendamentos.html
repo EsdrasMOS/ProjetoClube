@@ -29,8 +29,12 @@
                     <td>{{ ag.data_hora|date:"d/m/Y H:i" }}</td>
                     <td>{{ ag.observacao|truncatechars:20 }}</td>
                     <td>
-                        <a href="{% url 'editar_agendamento' ag.id %}">Editar</a> |
-                        <a href="{% url 'deletar_agendamento' ag.id %}" onclick="return confirm('Tem certeza?')">Deletar</a>
+                        {% if user == ag.socio.usuario or user.tipo_usuario == 'funcionario' %}
+                            <a href="{% url 'editar_agendamento' ag.id %}">Editar</a> |
+                        {% endif %}
+                        {% if user == ag.socio.usuario or user.tipo_usuario == 'funcionario' %}
+                            <a href="{% url 'deletar_agendamento' ag.id %}" onclick="return confirm('Tem certeza?')">Deletar</a>
+                        {% endif %}
                     </td>
                 </tr>
             {% endfor %}

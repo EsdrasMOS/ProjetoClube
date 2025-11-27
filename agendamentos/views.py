@@ -6,57 +6,68 @@ from usuarios.models import Usuario
 from django.core.paginator import Paginator
 from django.db.models import Q
 from .forms import AgendamentoForm
+from cobrancas.models import Cobranca
 
 @login_required
 def novo_agendamento(request):
+    print("View novo_agendamento chamada")  
     if request.user.tipo_usuario != Usuario.IS_SOCIO:
         messages.error(request, 'Acesso negado.')
         return redirect('dashboard_funcionario')
     
+    servicos = Servico.objects.all()
+    print(f"Serviços disponíveis: {servicos}") 
+    
     if request.method == 'POST':
-        form = AgendamentoForm(request.POST)
-        if form.is_valid():
-            agendamento = form.save(commit=False)
-            agendamento.socio = request.user.socio
-            agendamento.save()
-            messages.success(request, 'Agendamento criado com sucesso!')
-            return redirect('lista_agendamentos')
-    else:
-        form = AgendamentoForm()
-    return render(request, 'agendamentos/novo_agendamento.html', {'form': form})
+        print(f"POST data: {request.POST}")  # Debug
+        servico_id = request.POST.get('servico')
+        print(f"Servico ID recebido: {servico_id}")
+        data_hora = request.POST.get('data_hora')
+        observacao = request.POST.get('observacao', '')
+        servico = Servico.objects.get(id=servico_id)
+        socio = request.user.socio
+        agendamento = Agendamento.objects.create(socio=socio, servico=servico, data_hora=data_hora, observacao=observacao)
+        
+        from django.utils import timezone
+        vencimento = timezone.now().date() + timezone.timedelta(days=30) 
+        Cobranca.objects.create(
+            socio=socio,
+            servico=servico,
+            vencimento=vencimento,
+            observacao=f'Cobrança gerada do agendamento {agendamento.id}'
+        )
+        
+        messages.success(request, 'Agendamento criado e cobrança gerada!')
+        return redirect('lista_agendamentos')
+    return render(request, 'agendamentos/novo_agendamento.html', {'servicos': servicos})
 
 @login_required
 def lista_agendamentos(request):
-    query = request.GET.get('q', '')
     if request.user.tipo_usuario == Usuario.IS_SOCIO:
-        agendamentos_list = Agendamento.objects.filter(socio__usuario=request.user)
+        agendamentos_list = Agendamento.objects.filter(socio__usuario=request.user).order_by('-data_hora')  # Adicione order_by
     else:
-        agendamentos_list = Agendamento.objects.all()
-    
-    agendamentos_list = agendamentos_list.filter(
-        Q(servico__nome__icontains=query) | Q(observacao__icontains=query)
-    )
+        agendamentos_list = Agendamento.objects.all().order_by('-data_hora')
     paginator = Paginator(agendamentos_list, 10)
     page_number = request.GET.get('page')
     agendamentos = paginator.get_page(page_number)
-    return render(request, 'agendamentos/lista_agendamentos.html', {'agendamentos': agendamentos, 'query': query})
+    return render(request, 'agendamentos/lista_agendamentos.html', {'agendamentos': agendamentos})
 
 @login_required
 def editar_agendamento(request, agendamento_id):
     agendamento = get_object_or_404(Agendamento, id=agendamento_id)
-    if agendamento.socio.usuario != request.user and request.user.tipo_usuario != Usuario.IS_FUNCIONARIO:
+    if not (request.user == agendamento.socio.usuario or request.user.tipo_usuario == Usuario.IS_FUNCIONARIO):
         messages.error(request, 'Acesso negado.')
         return redirect('lista_agendamentos')
     
-    servicos = Servico.objects.all()
     if request.method == 'POST':
-        agendamento.servico_id = request.POST.get('servico')
-        agendamento.data_hora = request.POST.get('data_hora')
-        agendamento.observacao = request.POST.get('observacao', '')
-        agendamento.save()
-        messages.success(request, 'Agendamento atualizado!')
-        return redirect('lista_agendamentos')
-    return render(request, 'agendamentos/editar_agendamento.html', {'agendamento': agendamento, 'servicos': servicos})
+        form = AgendamentoForm(request.POST, instance=agendamento)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Agendamento atualizado!')
+            return redirect('lista_agendamentos')
+    else:
+        form = AgendamentoForm(instance=agendamento)
+    return render(request, 'agendamentos/editar_agendamento.html', {'form': form})
 
 @login_required
 def deletar_agendamento(request, agendamento_id):

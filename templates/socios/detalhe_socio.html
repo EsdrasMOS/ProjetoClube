@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block title %}Detalhes do Sócio{% endblock %}
+
+{% block content %}
+<h1>Detalhes do Sócio</h1>
+<p><strong>Nome:</strong> {{ socio.nome }}</p>
+<p><strong>CPF:</strong> {{ socio.cpf }}</p>
+<p><strong>E-mail:</strong> {{ socio.email }}</p>
+<p><strong>Telefone:</strong> {{ socio.telefone }}</p>
+<p><strong>Data de Nascimento:</strong> {{ socio.data_nascimento|date:"d/m/Y" }}</p>
+<a href="{% url 'lista_socios' %}">Voltar à Lista</a>
+{% endblock %}
